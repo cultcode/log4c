@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <log4c.h>
+#include <time.h>
+#include <sys/types.h>
+#include <unistd.h>
 /* using internal log4c debug function here,
  * this is not belong to examples :-) */
 #include <sd/error.h>
@@ -31,26 +34,47 @@ static const char* userloc_format(
     const log4c_layout_t*       a_layout,
     const log4c_logging_event_t*a_event)
 {
-    static char buffer[4096];
+    static char buffer_time[1024]={0};
+    static char buffer[4096]={0};
     user_locinfo_t* uloc = NULL;
 
-    sd_debug("Formatter s13_userloc checking location info for userdata %X",a_event->evt_loc->loc_data);
+#ifdef LOG4C_POSIX_TIMESTAMP
+    struct tm tm;
+    time_t t;
+
+    t = a_event->evt_timestamp.tv_sec;
+    localtime_r(&t, &tm);
+    snprintf(buffer, sizeof(buffer), "%04d%02d%02d %02d:%02d:%02d.%03ld[%-8s]",
+             tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+             tm.tm_hour, tm.tm_min, tm.tm_sec,
+             a_event->evt_timestamp.tv_usec / 1000,
+             log4c_priority_to_string(a_event->evt_priority));
+#else
+    SYSTEMTIME stime, ltime;
+
+    if (FileTimeToSystemTime(&a_event->evt_timestamp, &stime) &&
+        SystemTimeToTzSpecificLocalTime(NULL, &stime, &ltime)) {
+        snprintf(buffer, sizeof(buffer), "%04d%02d%02d %02d:%02d:%02d.%03ld[%-8s]",
+                 ltime.wYear, ltime.wMonth , ltime.wDay,
+                 ltime.wHour, ltime.wMinute, ltime.wSecond,
+                 ltime.wMilliseconds,
+                 log4c_priority_to_string(a_event->evt_priority));
+    }
+#endif
+
+    strcpy(buffer_time, buffer);
+
+    sd_debug("Formatter s13_userloc checking location info for userdata %p",a_event->evt_loc->loc_data);
     if (a_event->evt_loc->loc_data != NULL)
     {
-	sd_debug("Formatter s13_userloc getting a valid user location info pointer");
-        uloc = (user_locinfo_t*) a_event->evt_loc->loc_data;
-        sprintf(buffer, "[%s][HOST:%s][PID:%i][FILE:%s][LINE:%i][MSG:%s]",
-		a_event->evt_category,  
-		uloc->hostname, uloc->pid, a_event->evt_loc->loc_file,
-		a_event->evt_loc->loc_line,a_event->evt_msg);
-
-    }
-    else
-    {
-        sprintf(buffer, "[%s]::[FILE:%s][LINE:%i][MSG::%s]", 
-		a_event->evt_category,  
-		a_event->evt_loc->loc_file,
-		a_event->evt_loc->loc_line,a_event->evt_msg);
+      sd_debug("Formatter s13_userloc getting a valid user location info pointer");
+      uloc = (user_locinfo_t*) a_event->evt_loc->loc_data;
+      sprintf(buffer, "%s[%s+%i][%i][%s][%s]",
+        buffer_time,
+        a_event->evt_loc->loc_file, a_event->evt_loc->loc_line,
+        getpid(),
+        uloc->code,
+        a_event->evt_msg);
     }
     return buffer;
 }
