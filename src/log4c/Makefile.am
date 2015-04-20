@@ -15,6 +15,7 @@ liblog4c_la_SOURCES = \
 	appender_type_stream.c \
 	appender_type_stream2.c \
 	appender_type_syslog.c \
+	layout_type_userloc.c \
 	layout_type_basic.c \
 	layout_type_dated.c \
 	layout_type_dated_local.c \
@@ -51,6 +52,7 @@ pkginclude_HEADERS = \
 	location_info.h \
 	logging_event.h \
 	priority.h \
+	layout_type_userloc.h \
 	layout_type_basic.h \
 	layout_type_dated.h \
 	layout_type_dated_local.h \
