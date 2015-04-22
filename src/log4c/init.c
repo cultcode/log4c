@@ -29,6 +29,8 @@ static const char version[] = "$Id: init.c,v 1.22 2013/09/29 17:50:09 valtri Exp
 #include <appender_type_mmap.h>
 #include <appender_type_rollingfile.h>
 #include <rollingpolicy_type_sizewin.h>
+#include <rollingpolicy_type_timewin.h>
+#include <layout_type_userloc.h>
 #include <layout_type_basic.h>
 #include <layout_type_dated.h>
 #include <layout_type_dated_local.h>
@@ -41,6 +43,7 @@ static const char version[] = "$Id: init.c,v 1.22 2013/09/29 17:50:09 valtri Exp
 #endif
 
 static const log4c_layout_type_t * const layout_types[] = {
+    &log4c_layout_type_userloc,
     &log4c_layout_type_basic,
     &log4c_layout_type_dated,
     &log4c_layout_type_dated_local,
@@ -67,7 +70,8 @@ static size_t nappender_types = sizeof(appender_types) / sizeof(appender_types[0
 
 #ifdef WITH_ROLLINGFILE
 static const log4c_rollingpolicy_type_t * const rollingpolicy_types[] = {
-    &log4c_rollingpolicy_type_sizewin
+    &log4c_rollingpolicy_type_sizewin,
+    &log4c_rollingpolicy_type_timewin
 };
 static size_t nrollingpolicy_types = 
     sizeof(rollingpolicy_types) / sizeof(rollingpolicy_types[0]);

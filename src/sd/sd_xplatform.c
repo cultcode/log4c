@@ -139,12 +139,15 @@ struct tm *sd_localtime_r(const time_t *timep, struct tm *result) {
 
 /* native Windows environment */
 
-int sd_gettimeofday(LPFILETIME lpft, void* tzp) {
+int sd_gettimeofday(LPFILETIME lpft, LPTIME_ZONE_INFORMATION tzp) {
 
     if (lpft) {
         GetSystemTimeAsFileTime(lpft);
     }
     /* 0 indicates that the call succeeded. */
+    if (tzp) {
+      GetTimeZoneInformation(tzp);
+    }
     return 0;
 }
 

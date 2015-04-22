@@ -19,6 +19,7 @@ static const char version[] = "$Id: rc.c,v 1.13 2009/05/04 12:30:45 legoater Exp
 #include <log4c/appender_type_rollingfile.h>
 #include <log4c/rollingpolicy.h>
 #include <log4c/rollingpolicy_type_sizewin.h>
+#include <log4c/rollingpolicy_type_timewin.h>
 #include <sd/error.h>
 #include <sd/domnode.h>
 #include <sd/malloc.h>
@@ -310,6 +311,39 @@ static int rollingpolicy_load(log4c_rc_t* this, sd_domnode_t* anode)
         }        
        
       }
+      else if (!strcasecmp(type->value, "timewin")){
+    sd_domnode_t*  timetype  = sd_domnode_attrs_get(anode, "timetype");
+    sd_domnode_t*  maxnum = sd_domnode_attrs_get(anode, "maxnum");
+    rollingpolicy_timewin_udata_t *timewin_udatap = NULL;
+    
+    sd_debug("type='timewin', timetype='%s', maxnum='%s', "
+         "rpolicyname='%s'",
+      (timetype && timetype->value ? timetype->value :"(not set)"),
+      (maxnum && maxnum->value ? maxnum->value :"(not set)"),
+      (name && name->value ? name->value :"(not set)"));
+    /*
+     * Get a new sizewin policy type and configure it.
+     * Then attach it to the policy object.
+     * Check to see if this policy already has a
+     sw udata object. If so, leave as is except update
+     the params
+    */
+    if ( !(timewin_udatap = log4c_rollingpolicy_get_udata(rpolicyp))){ 
+     sd_debug("creating new sizewin udata for this policy");
+     timewin_udatap = timewin_make_udata();
+     log4c_rollingpolicy_set_udata(rpolicyp,timewin_udatap);  
+     timewin_udata_set_file_time_type(timewin_udatap, atoi(timetype->value));
+     timewin_udata_set_max_num_files(timewin_udatap, atoi(maxnum->value));
+    }else{
+     sd_debug("policy already has a sizewin udata--just updating params");
+    timewin_udata_set_file_time_type(timewin_udatap, atoi(timetype->value));
+    timewin_udata_set_max_num_files(timewin_udatap, atoi(maxnum->value));
+     /* allow the policy to initialize itself */
+    log4c_rollingpolicy_init(rpolicyp, 
+      log4c_rollingpolicy_get_rfudata(rpolicyp));
+    }    
+    
+   }
     
     }
     sd_debug("]");

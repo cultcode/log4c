@@ -9,6 +9,7 @@ static const char version[] = "$Id: layout.c,v 1.7 2013/04/06 13:04:53 valtri Ex
  */
 
 #include <log4c/layout.h>
+#include <log4c/layout_type_userloc.h>
 #include <log4c/layout_type_basic.h>
 #include <log4c/layout_type_dated.h>
 #include <log4c/priority.h>
@@ -105,8 +106,9 @@ extern log4c_layout_t* log4c_layout_get(const char* a_name)
 	log4c_layout_factory = sd_factory_new("log4c_layout_factory", 
 					      &log4c_layout_factory_ops);
 	/* build default layouts */
-	log4c_layout_set_type(log4c_layout_get("dated"), &log4c_layout_type_dated);
+	log4c_layout_set_type(log4c_layout_get("userloc"), &log4c_layout_type_userloc);
 	log4c_layout_set_type(log4c_layout_get("basic"), &log4c_layout_type_basic);
+	log4c_layout_set_type(log4c_layout_get("dated"), &log4c_layout_type_dated);
     }
 
     return sd_factory_get(log4c_layout_factory, a_name);

@@ -59,8 +59,10 @@ and have the base acessor function do the mapping
 #if !defined(_WIN32) || defined(__MINGW32__) || defined(__MINGW64__)
 #define LOG4C_POSIX_TIMESTAMP 1
     struct timeval evt_timestamp;
+    struct timezone evt_timezone;
 #else
     FILETIME evt_timestamp;
+    TIME_ZONE_INFORMATION evt_timezone;
 #endif
     const log4c_location_info_t* evt_loc;
 

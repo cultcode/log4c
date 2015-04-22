@@ -259,7 +259,7 @@ extern void __log4c_category_vlog(const log4c_category_t* this,
   evt.evt_priority	= a_priority;
   evt.evt_msg	        = message;
   evt.evt_loc	        = a_locinfo;
-  SD_GETTIMEOFDAY(&evt.evt_timestamp, NULL);
+  SD_GETTIMEOFDAY(&evt.evt_timestamp, &evt.evt_timezone);
   
   for (cat = this; cat; cat = cat->cat_parent) {
     if (cat->cat_appender)
@@ -271,6 +271,98 @@ extern void __log4c_category_vlog(const log4c_category_t* this,
   if (!evt.evt_buffer.buf_maxsize) {
     free(message);
     free(evt.evt_buffer.buf_data);
+  }
+}
+
+LOG4C_ATTRIBUTE((format(printf, 5, 6)))
+extern void log4c_category_userloc_error(
+    const log4c_category_t* a_category,
+    char* file,
+    int   line,
+    void* a_void,
+    const char* a_format,
+    ...)
+{
+  log4c_location_info_t a_locinfo;
+  a_locinfo.loc_file = file;
+  a_locinfo.loc_line = line;
+  a_locinfo.loc_data = a_void;
+  int a_priority = LOG4C_PRIORITY_ERROR;
+
+  if (log4c_category_is_priority_enabled(a_category, a_priority)) {
+    va_list va;
+    va_start(va, a_format);
+    __log4c_category_vlog(a_category, &a_locinfo, a_priority, a_format, va);
+    va_end(va);
+  }
+}
+
+LOG4C_ATTRIBUTE((format(printf, 5, 6)))
+extern void log4c_category_userloc_warn(
+    const log4c_category_t* a_category,
+    char* file,
+    int   line,
+    void* a_void,
+    const char* a_format,
+    ...)
+{
+  log4c_location_info_t a_locinfo;
+  a_locinfo.loc_file = file;
+  a_locinfo.loc_line = line;
+  a_locinfo.loc_data = a_void;
+  int a_priority = LOG4C_PRIORITY_WARN;
+
+  if (log4c_category_is_priority_enabled(a_category, a_priority)) {
+    va_list va;
+    va_start(va, a_format);
+    __log4c_category_vlog(a_category, &a_locinfo, a_priority, a_format, va);
+    va_end(va);
+  }
+}
+
+LOG4C_ATTRIBUTE((format(printf, 5, 6)))
+extern void log4c_category_userloc_info(
+    const log4c_category_t* a_category,
+    char* file,
+    int   line,
+    void* a_void,
+    const char* a_format,
+    ...)
+{
+  log4c_location_info_t a_locinfo;
+  a_locinfo.loc_file = file;
+  a_locinfo.loc_line = line;
+  a_locinfo.loc_data = a_void;
+  int a_priority = LOG4C_PRIORITY_INFO;
+
+  if (log4c_category_is_priority_enabled(a_category, a_priority)) {
+    va_list va;
+    va_start(va, a_format);
+    __log4c_category_vlog(a_category, &a_locinfo, a_priority, a_format, va);
+    va_end(va);
+  }
+}
+
+LOG4C_ATTRIBUTE((format(printf, 5, 6)))
+extern void log4c_category_userloc_debug(
+    const log4c_category_t* a_category,
+    char* file,
+    int   line,
+    void* a_void,
+    const char* a_format,
+    ...)
+{
+  log4c_location_info_t a_locinfo;
+  a_locinfo.loc_file = file;
+  a_locinfo.loc_line = line;
+  a_locinfo.loc_data = a_void;
+  int a_priority = LOG4C_PRIORITY_DEBUG;
+
+  if (log4c_category_is_priority_enabled(a_category, a_priority)) {
+    va_list va;
+    va_start(va, a_format);
+    __log4c_category_vlog(a_category, &a_locinfo, a_priority, a_format, va);
+    va_end(va);
   }
 }
 

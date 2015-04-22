@@ -66,7 +66,7 @@ extern int sd_getopt(int argc, char *const *argv, const char *opts);
 #if defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__)
 
 #define SD_GETTIMEOFDAY(a,b) sd_gettimeofday(a,b)
-extern int sd_gettimeofday(LPFILETIME lpft, void* tzp);
+extern int sd_gettimeofday(LPFILETIME lpft, LPTIME_ZONE_INFORMATION tzp);
 #else
 #define SD_GETTIMEOFDAY(a,b) gettimeofday(a,b)
 

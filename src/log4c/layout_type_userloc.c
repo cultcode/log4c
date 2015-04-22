@@ -22,7 +22,7 @@ static const char* userloc_format(
     const log4c_logging_event_t*a_event)
 {
     static char buffer_time[1024]={0};
-    static char buffer[4096]={0};
+    static char buffer[1024]={0};
     char* code = NULL;
 
 #ifdef LOG4C_POSIX_TIMESTAMP
@@ -31,20 +31,22 @@ static const char* userloc_format(
 
     t = a_event->evt_timestamp.tv_sec;
     localtime_r(&t, &tm);
-    snprintf(buffer, sizeof(buffer), "%04d%02d%02d %02d:%02d:%02d.%03ld[%-8s]",
+    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02dT%02d:%02d:%02d.%03ld+%d[%s]",
              tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
              tm.tm_hour, tm.tm_min, tm.tm_sec,
              a_event->evt_timestamp.tv_usec / 1000,
+             a_event->evt_timezone.tz_minuteswest / -60,
              log4c_priority_to_string(a_event->evt_priority));
 #else
     SYSTEMTIME stime, ltime;
 
     if (FileTimeToSystemTime(&a_event->evt_timestamp, &stime) &&
         SystemTimeToTzSpecificLocalTime(NULL, &stime, &ltime)) {
-        snprintf(buffer, sizeof(buffer), "%04d%02d%02d %02d:%02d:%02d.%03ld[%-8s]",
+        snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d.%03ld+%d[%s]",
                  ltime.wYear, ltime.wMonth , ltime.wDay,
                  ltime.wHour, ltime.wMinute, ltime.wSecond,
                  ltime.wMilliseconds,
+                 a_event->evt_timezone.Bias / -60,
                  log4c_priority_to_string(a_event->evt_priority));
     }
 #endif
@@ -56,7 +58,7 @@ static const char* userloc_format(
     {
       sd_debug("Formatter s13_userloc getting a valid user location info pointer");
       code = (char*) a_event->evt_loc->loc_data;
-      sprintf(buffer, "%s[%s+%i][%i][%s][%s]",
+      sprintf(buffer, "%s[%s+%i][%i][%s][%s]\n",
         buffer_time,
         a_event->evt_loc->loc_file, a_event->evt_loc->loc_line,
         getpid(),

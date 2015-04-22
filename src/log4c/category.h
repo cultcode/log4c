@@ -337,6 +337,15 @@ LOG4C_API void __log4c_category_vlog(const log4c_category_t* a_category,
 				  const char* a_format, 
 				  va_list a_args);
 
+LOG4C_API void log4c_category_log_userloc(const log4c_category_t* a_category, 
+          char* file,
+          int   line,
+          const char* func,
+          void* a_void,
+          int a_priority,
+          const char* a_format,
+          ...);
+
 /**
  * @internal
  *
@@ -403,31 +412,6 @@ static void log4c_category_log_locinfo(
 	__log4c_category_vlog(a_category, a_locinfo, a_priority, a_format, va);
 	va_end(va);
     }
-}
-
-LOG4C_INLINE LOG4C_ATTRIBUTE((format(printf, 7, 8)))
-static void log4c_category_log_userloc(
-    const log4c_category_t* a_category,
-    char* file,
-    int   line,
-    const char* func,
-    void* a_void,
-    int a_priority,
-    const char* a_format,
-    ...)
-{
-  log4c_location_info_t a_locinfo;
-  a_locinfo.loc_file = file;
-  a_locinfo.loc_line = line;
-  a_locinfo.loc_function = func;
-  a_locinfo.loc_data = a_void;
-
-  if (log4c_category_is_priority_enabled(a_category, a_priority)) {
-    va_list va;
-    va_start(va, a_format);
-    __log4c_category_vlog(a_category, &a_locinfo, a_priority, a_format, va);
-    va_end(va);
-  }
 }
 
 /** 

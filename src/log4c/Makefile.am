@@ -31,14 +31,15 @@ liblog4c_la_SOURCES = \
 
 if WITH_ROLLINGFILE
 liblog4c_la_SOURCES += appender_type_rollingfile.c \
-                          rollingpolicy.c rollingpolicy_type_sizewin.c
+                          rollingpolicy.c rollingpolicy_type_sizewin.c rollingpolicy_type_timewin.c
 endif
 
 if WITH_MMAP
 liblog4c_la_SOURCES += appender_type_mmap.c
 endif
 
-liblog4c_la_LDFLAGS = -version-info @LT_VERSION@ $(LDFLAGS_NOUNDEFINED) \
+#liblog4c_la_LDFLAGS = -version-info @LT_VERSION@ $(LDFLAGS_NOUNDEFINED) \
+liblog4c_la_LDFLAGS = -module -avoid-version \
 	$(def_ldflags)
 liblog4c_la_LIBADD  = ../sd/liblog4c_sd.la
 
@@ -68,7 +69,8 @@ pkginclude_HEADERS = \
 	category.h \
   appender_type_rollingfile.h \
   rollingpolicy.h \
-  rollingpolicy_type_sizewin.h
+  rollingpolicy_type_sizewin.h \
+  rollingpolicy_type_timewin.h
 
 if WIN32
 install-exec-local:
