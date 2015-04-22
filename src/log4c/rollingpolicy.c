@@ -9,6 +9,7 @@
 #include <log4c/appender_type_rollingfile.h>
 #include <log4c/rollingpolicy.h>
 #include <log4c/rollingpolicy_type_sizewin.h>
+#include <log4c/rollingpolicy_type_timewin.h>
 #include <string.h>
 #include <sd/malloc.h>
 #include <sd/factory.h>
@@ -94,7 +95,7 @@ LOG4C_API log4c_rollingpolicy_t* log4c_rollingpolicy_new(const char* a_name){
   sd_debug("new policy name='%s'", a_name);
   this	          = sd_calloc(1, sizeof(log4c_rollingpolicy_t));
   this->policy_name     = sd_strdup(a_name);
-  this->policy_type     = &log4c_rollingpolicy_type_sizewin;
+  this->policy_type     = NULL;
   this->policy_udata    = NULL;
   this->policy_rfudatap  = NULL;
   this->policy_flags = 0; 
